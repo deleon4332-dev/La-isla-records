@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>La Isla Records — Estudio de Grabación</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #00BFFF;        /* Azul neón — cámbialo por un hex distinto para otro color */
+    --gold-light: #40D4FF;  /* Azul neón claro */
+    --gold-dark: #007BA8;   /* Azul neón oscuro */
+    --black: #050505;
+    --dark: #0E0E0E;
+    --dark2: #161616;
+    --dark3: #1E1E1E;
+    --white: #F5F0E8;
+    --gray: #888;
+    --red: #C0392B;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Syne', sans-serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    position: fixed;
+    width: 12px; height: 12px;
+    background: var(--gold);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s, width 0.2s, height 0.2s;
+    mix-blend-mode: difference;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 36px; height: 36px;
+    border: 1px solid var(--gold);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: all 0.15s ease;
+    opacity: 0.6;
+  }
+
+  /* Noise overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9990;
+    opacity: 0.3;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 1.5rem 4rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(to bottom, rgba(5,5,5,0.95), transparent);
+  }
+
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    letter-spacing: 0.12em;
+    color: var(--gold);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .nav-logo span {
+    color: var(--white);
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 2.5rem;
+    list-style: none;
+  }
+  .nav-links a {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gray);
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+  .nav-links a:hover { color: var(--gold); }
+
+  .nav-cta {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    background: var(--gold);
+    color: var(--black);
+    padding: 0.6rem 1.4rem;
+    border: none;
+    cursor: none;
+    font-weight: 700;
+    transition: background 0.3s, transform 0.2s;
+    text-decoration: none;
+  }
+  .nav-cta:hover {
+    background: var(--gold-light);
+    transform: translateY(-1px);
+  }
+
+  /* ─── HERO ─── */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-rows: 1fr;
+    align-items: center;
+    padding: 0 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 70% 50%, rgba(201,168,76,0.08) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 60% at 20% 80%, rgba(192,57,43,0.06) 0%, transparent 60%);
+  }
+
+  .hero-lines {
+    position: absolute;
+    right: 0; top: 0; bottom: 0;
+    width: 50%;
+    background-image: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 59px,
+      rgba(201,168,76,0.04) 59px,
+      rgba(201,168,76,0.04) 60px
+    );
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 900px;
+  }
+
+  .hero-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .hero-tag::before {
+    content: '';
+    width: 40px;
+    height: 1px;
+    background: var(--gold);
+    display: inline-block;
+  }
+
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(5rem, 12vw, 11rem);
+    line-height: 0.92;
+    letter-spacing: 0.02em;
+    color: var(--white);
+    margin-bottom: 0.2em;
+  }
+
+  .hero-title .accent {
+    color: var(--gold);
+    display: block;
+  }
+
+  .hero-subtitle {
+    font-size: 1rem;
+    color: var(--gray);
+    max-width: 480px;
+    line-height: 1.7;
+    margin: 1.5rem 0 2.5rem;
+    font-weight: 400;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 1.2rem;
+    align-items: center;
+  }
+
+  .btn-primary {
+    background: var(--gold);
+    color: var(--black);
+    padding: 1rem 2.2rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 700;
+    text-decoration: none;
+    border: none;
+    cursor: none;
+    transition: background 0.3s, transform 0.2s;
+    display: inline-block;
+  }
+  .btn-primary:hover {
+    background: var(--gold-light);
+    transform: translateY(-2px);
+  }
+
+  .btn-outline {
+    border: 1px solid rgba(201,168,76,0.4);
+    color: var(--gold);
+    padding: 1rem 2.2rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 700;
+    text-decoration: none;
+    transition: border-color 0.3s, background 0.3s;
+    display: inline-block;
+  }
+  .btn-outline:hover {
+    border-color: var(--gold);
+    background: rgba(201,168,76,0.08);
+  }
+
+  .hero-stats {
+    position: absolute;
+    bottom: 3rem;
+    right: 4rem;
+    display: flex;
+    gap: 3rem;
+    z-index: 2;
+  }
+
+  .stat-item { text-align: right; }
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.4rem;
+    color: var(--gold);
+    line-height: 1;
+    letter-spacing: 0.05em;
+  }
+  .stat-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gray);
+    margin-top: 4px;
+  }
+
+  .scroll-indicator {
+    position: absolute;
+    bottom: 3rem;
+    left: 4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    z-index: 2;
+  }
+  .scroll-line {
+    width: 1px;
+    height: 50px;
+    background: linear-gradient(to bottom, var(--gold), transparent);
+    animation: scrollPulse 2s ease-in-out infinite;
+  }
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 0.3; transform: scaleY(1); }
+    50% { opacity: 1; transform: scaleY(1.2); }
+  }
+  .scroll-text {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gray);
+    writing-mode: vertical-rl;
+  }
+
+  /* ─── MARQUEE ─── */
+  .marquee-section {
+    overflow: hidden;
+    border-top: 1px solid rgba(201,168,76,0.15);
+    border-bottom: 1px solid rgba(201,168,76,0.15);
+    padding: 1.2rem 0;
+    background: var(--dark2);
+  }
+
+  .marquee-track {
+    display: flex;
+    gap: 3rem;
+    animation: marquee 20s linear infinite;
+    white-space: nowrap;
+  }
+
+  .marquee-track:hover { animation-play-state: paused; }
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  .marquee-item {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 0.2em;
+    color: var(--gray);
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-shrink: 0;
+  }
+
+  .marquee-item .dot {
+    width: 6px; height: 6px;
+    background: var(--gold);
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* ─── SECCIONES ─── */
+  section { padding: 7rem 4rem; }
+
+  .section-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+  .section-tag::before {
+    content: '';
+    width: 24px; height: 1px;
+    background: var(--gold);
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 6vw, 5.5rem);
+    line-height: 1;
+    letter-spacing: 0.03em;
+    color: var(--white);
+    margin-bottom: 1rem;
+  }
+
+  .section-title .line2 {
+    color: var(--gold);
+  }
+
+  /* ─── ABOUT ─── */
+  .about {
+    background: var(--dark2);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5rem;
+    align-items: center;
+  }
+
+  .about-visual {
+    position: relative;
+    height: 500px;
+  }
+
+  .about-img-box {
+    position: absolute;
+    background: var(--dark3);
+    border: 1px solid rgba(201,168,76,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .about-img-main {
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .studio-icon {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .about-badge {
+    position: absolute;
+    bottom: 2rem;
+    right: -1rem;
+    background: var(--gold);
+    color: var(--black);
+    padding: 1.2rem 1.5rem;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 0.1em;
+    line-height: 1.2;
+    z-index: 2;
+    text-align: center;
+  }
+  .about-badge span {
+    display: block;
+    font-size: 2.5rem;
+    line-height: 1;
+  }
+
+  .about-text p {
+    color: var(--gray);
+    line-height: 1.8;
+    margin-bottom: 1.2rem;
+    font-size: 0.95rem;
+  }
+
+  .about-features {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .about-feature {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+  }
+
+  .feature-dot {
+    width: 6px; height: 6px;
+    background: var(--gold);
+    border-radius: 50%;
+    margin-top: 7px;
+    flex-shrink: 0;
+  }
+
+  .about-feature span {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    color: var(--white);
+    text-transform: uppercase;
+  }
+
+  /* ─── SERVICIOS ─── */
+  .services { background: var(--black); }
+
+  .services-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 4rem;
+  }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5px;
+    background: rgba(201,168,76,0.1);
+  }
+
+  .service-card {
+    background: var(--dark2);
+    padding: 2.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.4s;
+    cursor: none;
+  }
+
+  .service-card::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--gold);
+    transform: scaleX(0);
+    transition: transform 0.4s ease;
+    transform-origin: left;
+  }
+
+  .service-card:hover { background: var(--dark3); }
+  .service-card:hover::before { transform: scaleX(1); }
+
+  .service-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.9rem;
+    color: rgba(201,168,76,0.35);
+    letter-spacing: 0.15em;
+    margin-bottom: 2rem;
+  }
+
+  .service-icon-wrap {
+    width: 52px; height: 52px;
+    border: 1px solid rgba(201,168,76,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    transition: border-color 0.3s, background 0.3s;
+  }
+
+  .service-card:hover .service-icon-wrap {
+    border-color: var(--gold);
+    background: rgba(201,168,76,0.1);
+  }
+
+  .service-icon-wrap svg {
+    width: 22px; height: 22px;
+    stroke: var(--gold);
+    fill: none;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .service-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 0.7rem;
+    letter-spacing: 0.02em;
+  }
+
+  .service-desc {
+    font-size: 0.85rem;
+    color: var(--gray);
+    line-height: 1.7;
+  }
+
+  /* ─── GÉNEROS ─── */
+  .genres { background: var(--dark2); }
+
+  .genres-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-top: 3rem;
+  }
+
+  .genre-card {
+    position: relative;
+    height: 280px;
+    overflow: hidden;
+    cursor: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 1.8rem;
+    background: var(--dark3);
+    border: 1px solid rgba(255,255,255,0.05);
+    transition: border-color 0.3s;
+  }
+
+  .genre-card:hover { border-color: rgba(201,168,76,0.3); }
+
+  .genre-bg {
+    position: absolute;
+    inset: 0;
+    transition: transform 0.5s ease;
+  }
+
+  .genre-card:hover .genre-bg { transform: scale(1.05); }
+
+  .genre-bg-trap { background: radial-gradient(ellipse at top, rgba(192,57,43,0.25) 0%, transparent 70%); }
+  .genre-bg-rap { background: radial-gradient(ellipse at top, rgba(41,128,185,0.2) 0%, transparent 70%); }
+  .genre-bg-reggaeton { background: radial-gradient(ellipse at top, rgba(39,174,96,0.2) 0%, transparent 70%); }
+  .genre-bg-otros { background: radial-gradient(ellipse at top, rgba(201,168,76,0.2) 0%, transparent 70%); }
+
+  .genre-lines {
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(
+      90deg,
+      transparent, transparent 39px,
+      rgba(255,255,255,0.02) 39px, rgba(255,255,255,0.02) 40px
+    );
+  }
+
+  .genre-num {
+    position: absolute;
+    top: 1.5rem; right: 1.5rem;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3.5rem;
+    color: rgba(255,255,255,0.06);
+    line-height: 1;
+    letter-spacing: 0.05em;
+  }
+
+  .genre-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+    position: relative;
+    z-index: 2;
+  }
+
+  .genre-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.2rem;
+    color: var(--white);
+    letter-spacing: 0.05em;
+    line-height: 1;
+    position: relative;
+    z-index: 2;
+  }
+
+  .genre-desc {
+    font-size: 0.78rem;
+    color: var(--gray);
+    margin-top: 0.5rem;
+    line-height: 1.5;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* ─── STUDIO ─── */
+  .studio-section { background: var(--black); }
+
+  .studio-grid {
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    gap: 3rem;
+    margin-top: 3rem;
+  }
+
+  .studio-main {
+    background: var(--dark2);
+    border: 1px solid rgba(201,168,76,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .studio-main-inner {
+    text-align: center;
+    position: relative;
+    z-index: 2;
+  }
+
+  .mixing-board {
+    width: 280px;
+    height: 200px;
+  }
+
+  .studio-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .studio-spec {
+    background: var(--dark2);
+    border: 1px solid rgba(201,168,76,0.12);
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: border-color 0.3s, background 0.3s;
+    cursor: none;
+  }
+
+  .studio-spec:hover {
+    border-color: rgba(201,168,76,0.4);
+    background: var(--dark3);
+  }
+
+  .spec-icon {
+    width: 40px; height: 40px;
+    background: rgba(201,168,76,0.1);
+    border: 1px solid rgba(201,168,76,0.25);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .spec-icon svg {
+    width: 18px; height: 18px;
+    stroke: var(--gold);
+    fill: none;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .spec-info { flex: 1; }
+
+  .spec-name {
+    font-weight: 700;
+    font-size: 0.88rem;
+    color: var(--white);
+    letter-spacing: 0.02em;
+    margin-bottom: 2px;
+  }
+
+  .spec-detail {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--gray);
+    letter-spacing: 0.05em;
+  }
+/* ─── IMAGE ─── */
+  img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+  /* ─── PROCESS ─── */
+  .process { background: var(--dark2); }
+
+  .process-steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    margin-top: 4rem;
+    position: relative;
+  }
+
+  .process-steps::before {
+    content: '';
+    position: absolute;
+    top: 2rem;
+    left: calc(12.5% + 1rem);
+    right: calc(12.5% + 1rem);
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--gold), transparent);
+    opacity: 0.3;
+  }
+
+  .process-step {
+    padding: 0 1.5rem;
+    position: relative;
+    text-align: center;
+  }
+
+  .step-circle {
+    width: 4rem; height: 4rem;
+    border: 1px solid rgba(201,168,76,0.4);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.3rem;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+    background: var(--dark2);
+    position: relative;
+    z-index: 2;
+  }
+
+  .step-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--white);
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.05em;
+  }
+
+  .step-desc {
+    font-size: 0.78rem;
+    color: var(--gray);
+    line-height: 1.6;
+  }
+
+  /* ─── CONTACT / BOOKING ─── */
+  .contact {
+    background: var(--dark2);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5rem;
+    align-items: start;
+  }
+
+  .contact-info h2 { margin-bottom: 1rem; }
+
+  .contact-info p {
+    font-size: 0.9rem;
+    color: var(--gray);
+    line-height: 1.8;
+    margin-bottom: 2.5rem;
+  }
+
+  .contact-details { display: flex; flex-direction: column; gap: 1rem; }
+
+  .contact-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border: 1px solid rgba(201,168,76,0.12);
+    transition: border-color 0.3s;
+  }
+
+  .contact-item:hover { border-color: rgba(201,168,76,0.35); }
+
+  .contact-item-icon {
+    width: 36px; height: 36px;
+    background: rgba(201,168,76,0.1);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .contact-item-icon svg {
+    width: 16px; height: 16px;
+    stroke: var(--gold);
+    fill: none;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .contact-item-text {
+    font-size: 0.85rem;
+    color: var(--white);
+  }
+
+  .contact-item-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--gray);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+
+  /* ─── FOOTER ─── */
+  footer {
+    background: var(--black);
+    border-top: 1px solid rgba(201,168,76,0.15);
+    padding: 3rem 4rem;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .footer-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3rem;
+    letter-spacing: 0.12em;
+    color: var(--gold);
+  }
+
+  .footer-logo span { color: var(--white); }
+
+  .footer-copy {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    color: var(--gray);
+    text-align: center;
+  }
+
+  .footer-social {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+  }
+
+  .social-btn {
+    width: 65px; height: 56px;
+    border: 1px solid rgba(201,168,76,0.2);
+    display: flex; align-items: center; justify-content: center;
+    cursor: none;
+    transition: border-color 0.3s, background 0.3s;
+    text-decoration: none;
+  }
+
+  .social-btn:hover {
+    border-color: var(--gold);
+    background: rgba(201,168,76,0.1);
+  }
+
+  .social-btn svg {
+    width: 30px; height: 30px;
+    stroke: var(--gold);
+    fill: none;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* ─── WAVEFORM animado ─── */
+  .waveform {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    height: 50px;
+  }
+
+  .wave-bar {
+    width: 3px;
+    background: var(--gold);
+    border-radius: 2px;
+    animation: waveAnim 1.2s ease-in-out infinite;
+    opacity: 0.7;
+  }
+
+  @keyframes waveAnim {
+    0%, 100% { transform: scaleY(0.3); opacity: 0.4; }
+    50% { transform: scaleY(1); opacity: 1; }
+  }
+
+  /* ─── ANIMATIONS ─── */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  .fade-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ─── Responsive ─── */
+  @media (max-width: 900px) {
+    nav { padding: 1.5rem 2rem; }
+    .nav-links { display: none; }
+    .hero { padding: 0 2rem; }
+    .hero-stats { right: 2rem; }
+    section { padding: 5rem 2rem; }
+    .about { grid-template-columns: 1fr; }
+    .services-grid { grid-template-columns: 1fr; }
+    .genres-grid { grid-template-columns: 1fr 1fr; }
+    .studio-grid { grid-template-columns: 1fr; }
+    .process-steps { grid-template-columns: 1fr 1fr; }
+    .testimonials-grid { grid-template-columns: 1fr; }
+    .contact { grid-template-columns: 1fr; }
+    footer { grid-template-columns: 1fr; text-align: center; }
+    .footer-social { justify-content: center; }
+    .hero-actions {
+  margin-bottom: 2rem;
+}
+
+.hero-stats {
+  position: static;
+  margin-top: 2rem;
+  justify-content: space-between;
+}
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">La Isla <span>Records</span></a>
+  <ul class="nav-links">
+    <li><a href="#about">Nosotros</a></li>
+    <li><a href="#servicios">Servicios</a></li>
+    <li><a href="#generos">Géneros</a></li>
+    <li><a href="#estudio">Estudio</a></li>
+  </ul>
+  <a href="#contacto" class="nav-cta">Reservar Sesión</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="inicio">
+  <div class="hero-bg"></div>
+  <div class="hero-lines"></div>
+  <div class="hero-content fade-up">
+    <p class="hero-tag">Estudio de Grabación Profesional</p>
+    <h1 class="hero-title">
+  <img src="img/Logo.png" alt="Logo" class="hero-logo">
+</h1>
+    <p class="hero-subtitle">Donde la música urbana nace. Trap, rap, reggaeton y más — grabado con el sonido que mereces en el estudio que lo hace real.</p>
+    <div class="hero-actions">
+      <a href="#contacto" class="btn-primary">Reserva tu Sesión</a>
+      <a href="#servicios" class="btn-outline">Ver Servicios</a>
+    </div>
+  </div>
+
+  <div class="hero-stats fade-up">
+    <div class="stat-item">
+      <div class="stat-num">50+</div>
+      <div class="stat-label">Tracks Producidos</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">4+</div>
+      <div class="stat-label">Años de Experiencia</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">20+</div>
+      <div class="stat-label">Artistas</div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-section">
+  <div class="marquee-track">
+    <div class="marquee-item"><span class="dot"></span> Grabación</div>
+    <div class="marquee-item"><span class="dot"></span> Mezcla</div>
+    <div class="marquee-item"><span class="dot"></span> Masterización</div>
+    <div class="marquee-item"><span class="dot"></span> Producción Musical</div>
+    <div class="marquee-item"><span class="dot"></span> Trap</div>
+    <div class="marquee-item"><span class="dot"></span> Rap</div>
+    <div class="marquee-item"><span class="dot"></span> Reggaeton</div>
+    <div class="marquee-item"><span class="dot"></span> Beat Making</div>
+    <div class="marquee-item"><span class="dot"></span> Grabación</div>
+    <div class="marquee-item"><span class="dot"></span> Mezcla</div>
+    <div class="marquee-item"><span class="dot"></span> Masterización</div>
+    <div class="marquee-item"><span class="dot"></span> Producción Musical</div>
+    <div class="marquee-item"><span class="dot"></span> Trap</div>
+    <div class="marquee-item"><span class="dot"></span> Rap</div>
+    <div class="marquee-item"><span class="dot"></span> Reggaeton</div>
+    <div class="marquee-item"><span class="dot"></span> Beat Making</div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <div class="about-visual fade-up">
+    <div style="width:100%; height:100%; background:var(--dark3); border:1px solid rgba(201,168,76,0.2); display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden;">
+        <img src="img/Estudio2.jpeg" alt="Estudio2">
+    </div>
+    <div class="about-badge">
+      <span>4+</span>
+      Años en<br>la industria
+    </div>
+  </div>
+
+  <div class="about-text fade-up">
+    <p class="section-tag">Quiénes Somos</p>
+    <h2 class="section-title">El Sonido<br><span class="line2">que Mueve</span></h2>
+    <p>La Isla Records nació con una misión clara: darle a los artistas urbanos un espacio donde su música suene al nivel de la competencia global. Somos más que un estudio — somos el punto de inicio de carreras.</p>
+    <p>Con equipos de última generación y productores con experiencia en los géneros más demandados del mercado, en La Isla todo lo que necesitas para llevar tu música al siguiente nivel está bajo un mismo techo.</p>
+
+    <div class="about-features">
+      <div class="about-feature">
+        <div class="feature-dot"></div>
+        <span>Cabina insonorizada</span>
+      </div>
+      <div class="about-feature">
+        <div class="feature-dot"></div>
+        <span>Producción en vivo</span>
+      </div>
+      <div class="about-feature">
+        <div class="feature-dot"></div>
+        <span>Mezcla profesional</span>
+      </div>
+      <div class="about-feature">
+        <div class="feature-dot"></div>
+        <span>Masterización digital</span>
+      </div>
+      <div class="about-feature">
+        <div class="feature-dot"></div>
+        <span>Beats originales</span>
+      </div>
+      <div class="about-feature">
+        <div class="feature-dot"></div>
+        <span>Distribución digital</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICIOS -->
+<section class="services" id="servicios">
+  <div class="services-header">
+    <div>
+      <p class="section-tag">Lo que Ofrecemos</p>
+      <h2 class="section-title">Nuestros<br><span class="line2">Servicios</span></h2>
+    </div>
+  </div>
+
+  <div class="services-grid">
+    <div class="service-card fade-up">
+      <div class="service-num">01</div>
+      <div class="service-icon-wrap">
+        <svg viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3M8 22h8"/></svg>
+      </div>
+      <div class="service-name">Grabación Vocal y afinación</div>
+      <div class="service-price">$53</div>
+    </div>
+    <div class="service-card fade-up">
+      <div class="service-num">02</div>
+      <div class="service-icon-wrap">
+        <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13M6 21a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM18 19a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/></svg>
+      </div>
+      <div class="service-name">Grabación y Mezcla</div>
+      <div class="service-price">$79</div>
+    </div>
+    <div class="service-card fade-up">
+      <div class="service-num">03</div>
+      <div class="service-icon-wrap">
+        <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      </div>
+      <div class="service-name">Mezcla & Masterización</div>
+      <div class="service-price">$118</div>
+    </div>
+    <div class="service-card fade-up">
+      <div class="service-num">04</div>
+      <div class="service-icon-wrap">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><path d="m16.24 7.76-2.12 2.12M10 10l-2.12-2.12"/></svg>
+      </div>
+      <div class="service-name">Masterización</div>
+      <div class="service-price">$53</div>
+    </div>
+    <div class="service-card fade-up">
+      <div class="service-num">05</div>
+      <div class="service-icon-wrap">
+        <svg viewBox="0 0 24 24"><path d="M15 10l4.553-2.069A1 1 0 0 1 21 8.82v6.36a1 1 0 0 1-1.447.889L15 14M3 8a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8z"/></svg>
+      </div>
+      <div class="service-name">Grabación, Mezcla y Masterización</div>
+      <div class="service-price">$197</div>
+    </div>
+  </div>
+</section>
+
+<!-- GÉNEROS -->
+<section class="genres" id="generos">
+  <p class="section-tag">Especialidades</p>
+  <h2 class="section-title">Nuestros<br><span class="line2">Géneros</span></h2>
+
+  <div class="genres-grid">
+    <div class="genre-card fade-up">
+      <div class="genre-bg genre-bg-trap"></div>
+      <div class="genre-lines"></div>
+      <div class="genre-num">01</div>
+      <div class="genre-tag">Principal</div>
+      <div class="genre-name">Trap</div>
+    </div>
+    <div class="genre-card fade-up">
+      <div class="genre-bg genre-bg-rap"></div>
+      <div class="genre-lines"></div>
+      <div class="genre-num">02</div>
+      <div class="genre-tag">Principal</div>
+      <div class="genre-name">Rap</div>
+    </div>
+    <div class="genre-card fade-up">
+      <div class="genre-bg genre-bg-reggaeton"></div>
+      <div class="genre-lines"></div>
+      <div class="genre-num">03</div>
+      <div class="genre-tag">Principal</div>
+      <div class="genre-name">Reggaeton</div>
+    </div>
+    <div class="genre-card fade-up">
+      <div class="genre-bg genre-bg-otros"></div>
+      <div class="genre-lines"></div>
+      <div class="genre-num">+</div>
+      <div class="genre-tag">Y mucho más</div>
+      <div class="genre-name">Otros</div>
+    </div>
+  </div>
+</section>
+
+<!-- ESTUDIO -->
+<section class="studio-section" id="estudio">
+  <div>
+    <p class="section-tag">Instalaciones</p>
+    <h2 class="section-title">Del<br><span class="line2">Estudio</span></h2>
+  </div>
+
+  <div class="studio-grid">
+    <div class="studio-main fade-up">
+        <img src="img/Estudio1.jpeg" alt="Estudio1">
+      </svg>
+    </div>
+
+    <div class="studio-sidebar fade-up">
+      <div class="studio-spec">
+        <div class="spec-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 0 1 21 12M15.54 8.46a5 5 0 0 1 1.46 3.54M8.46 15.54a5 5 0 0 1-3.54-1.46M4.93 19.07A10 10 0 0 1 3 12"/></svg>
+        </div>
+        <div class="spec-info">
+          <div class="spec-name">Akg p120</div>
+          <div class="spec-detail">Micrófono profesional</div>
+        </div>
+      </div>
+      <div class="studio-spec">
+        <div class="spec-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+        </div>
+        <div class="spec-info">
+          <div class="spec-name">Volt 276</div>
+          <div class="spec-detail">Interfaz universal de audio</div>
+        </div>
+      </div>
+      <div class="studio-spec">
+        <div class="spec-icon">
+          <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+        </div>
+        <div class="spec-info">
+          <div class="spec-name">Logic pro x</div>
+          <div class="spec-detail">DAW estándar de la industria</div>
+        </div>
+      </div>
+      <div class="studio-spec">
+        <div class="spec-icon">
+          <svg viewBox="0 0 24 24"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v1z"/></svg>
+        </div>
+        <div class="spec-info">
+          <div class="spec-name"> Krk / Mac</div>
+          <div class="spec-detail">Monitores y Computadora del estudio</div>
+        </div>
+      </div>
+      <div class="studio-spec">
+        <div class="spec-icon">
+          <svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+        </div>
+        <div class="spec-info">
+          <div class="spec-name">Cabina Insonorizada</div>
+          <div class="spec-detail">Aislamiento acústico</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESO -->
+<section class="process">
+  <div style="text-align:center; max-width:600px; margin:0 auto;">
+    <p class="section-tag" style="justify-content:center;">Cómo Trabajamos</p>
+    <h2 class="section-title" style="text-align:center;">El <span class="line2">Proceso</span></h2>
+  </div>
+
+  <div class="process-steps">
+    <div class="process-step fade-up">
+      <div class="step-circle">01</div>
+      <div class="step-name">Consulta</div>
+      <div class="step-desc">Nos cuentas tu visión, género y objetivos. Diseñamos el plan perfecto para tu proyecto.</div>
+    </div>
+    <div class="process-step fade-up">
+      <div class="step-circle">02</div>
+      <div class="step-name">Producción</div>
+      <div class="step-desc">Beats, arreglos y producción musical a medida. Tu sonido único toma forma.</div>
+    </div>
+    <div class="process-step fade-up">
+      <div class="step-circle">03</div>
+      <div class="step-name">Grabación</div>
+      <div class="step-desc">Sesión en cabina. Capturamos tu performance en audio de calidad profesional.</div>
+    </div>
+    <div class="process-step fade-up">
+      <div class="step-circle">04</div>
+      <div class="step-name">Entrega</div>
+      <div class="step-desc">Mezcla, masterización y entrega lista para plataformas de streaming y radio.</div>
+    </div>
+  </div>
+</section>
+<!-- CONTACTO -->
+<section class="contact" id="contacto">
+  <div class="contact-info fade-up">
+    <p class="section-tag">Hablemos</p>
+    <h2 class="section-title">Reserva tu<br><span class="line2">Sesión</span></h2>
+    <p>¿Listo para grabar? Contáctanos y agenda tu sesión. Respondemos en menos de 24 horas. Las sesiones pueden reservarse de día o de noche según tu disponibilidad.</p>
+
+    <div class="contact-details">
+      <div class="contact-item">
+        <div class="contact-item-icon">
+          <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41 2 2 0 0 1 3.6 1.21h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 21.73 16a2 2 0 0 1 .27.92z"/></svg>
+        </div>
+        <div class="contact-item-text">
+          <div class="contact-item-label">Teléfono / WhatsApp</div>
+          +502 4126 5667
+        </div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-item-icon">
+          <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+        <div class="contact-item-text">
+          <div class="contact-item-label">Email</div>
+          laislarecords1@gmail.com
+        </div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-item-icon">
+          <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        </div>
+        <div class="contact-item-text">
+          <div class="contact-item-label">Ubicación</div>
+          Zona 16, Guatemala
+        </div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-item-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div class="contact-item-text">
+          <div class="contact-item-label">Horario</div>
+          Lun – Dom: 3:00 PM – 10:00 PM
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="fade-up">
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <div class="footer-logo">La Isla <span>Records</span></div>
+    <div style="font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--gray);letter-spacing:0.12em;margin-top:6px;">Estudio de Grabación Profesional</div>
+  </div>
+  <div class="footer-copy">
+    © 2026 La Isla Records. Todos los derechos reservados.<br>Ciudad de Guatemala, Guatemala.
+  </div>
+  <div class="footer-social">
+    <a href="https://www.instagram.com/laislarecords?igsh=MTVqbmRtNXFoMXN3Mg%3D%3D" class="social-btn" title="Instagram">
+      <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+    </a>
+    <a href="https://www.tiktok.com/@laislarecords1?_r=1&_t=ZS-95XvSQ1U9u1" class="social-btn" title="TikTok">
+      <svg viewBox="0 0 24 24"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg>
+    </a>
+    <a href="https://www.youtube.com/channel/UC5V7VwtotPucZ3bTMwXCEpg" class="social-btn" title="YouTube">
+      <svg viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg>
+    </a>
+    <a href="https://open.spotify.com/intl-es/artist/2UCRQ8HJQKRwarUcT99Eo0" class="social-btn" title="Spotify">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 13.5a8.5 8.5 0 0 1 8 0M7 10.5a12 12 0 0 1 10 0M9 16.5a5 5 0 0 1 6 0"/></svg>
+    </a>
+  </div>
+</footer>
+
+<script>
+  // Cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx + 'px';
+    cursor.style.top = my + 'px';
+  });
+
+  function animateRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top = ry + 'px';
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  document.querySelectorAll('a, button, .service-card, .studio-spec, .genre-card').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.transform = 'translate(-50%, -50%) scale(2)';
+      ring.style.width = '56px'; ring.style.height = '56px';
+      ring.style.borderColor = 'var(--gold-light)';
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.style.transform = 'translate(-50%, -50%) scale(1)';
+      ring.style.width = '36px'; ring.style.height = '36px';
+      ring.style.borderColor = 'var(--gold)';
+    });
+  });
+
+  // Scroll animations
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 80);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+  // Nav scroll effect
+  const nav = document.querySelector('nav');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 80) {
+      nav.style.background = 'rgba(5,5,5,0.98)';
+      nav.style.borderBottom = '1px solid rgba(201,168,76,0.1)';
+    } else {
+      nav.style.background = 'linear-gradient(to bottom, rgba(5,5,5,0.95), transparent)';
+      nav.style.borderBottom = 'none';
+    }
+  });
+
+  // Form submit
+  function handleSubmit(e) {
+    e.preventDefault();
+    const btn = document.getElementById('submitBtn');
+    btn.textContent = '✓ Solicitud Enviada — Te Contactamos Pronto';
+    btn.style.background = '#1a6b3a';
+    btn.style.color = '#7fe0a8';
+    setTimeout(() => {
+      btn.textContent = 'Enviar Solicitud de Reserva';
+      btn.style.background = 'var(--gold)';
+      btn.style.color = 'var(--black)';
+    }, 4000);
+  }
+</script>
+</body>
+</html>
